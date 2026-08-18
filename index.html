@@ -398,6 +398,240 @@
   .modal-actions a.map-btn{grid-column:1 / -1; background:var(--navy-deep); color:#fff;}
 
   :focus-visible{outline:2.5px solid var(--gold); outline-offset:2px;}
+  /* =========================================================
+   ADD CLUB FORM — PREMIUM UI
+   ========================================================= */
+
+.add-club-modal-card{
+  padding:24px;
+}
+
+.add-club-modal-card .modal-header{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:24px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--line);
+}
+
+.add-club-modal-card .modal-icon{
+  width:52px;
+  height:52px;
+  flex-shrink:0;
+  border-radius:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:25px;
+  background:linear-gradient(135deg,var(--navy-deep),var(--navy-2));
+  box-shadow:0 8px 20px rgba(11,23,48,.18);
+}
+
+.add-club-modal-card .modal-header h2{
+  margin:0 0 4px;
+  font-family:'Cairo',sans-serif;
+  font-size:19px;
+  font-weight:800;
+  color:var(--navy-deep);
+}
+
+.add-club-modal-card .modal-header p{
+  margin:0;
+  font-size:12.5px;
+  line-height:1.6;
+  color:var(--muted);
+  font-weight:500;
+}
+
+/* form layout */
+
+#add-club-form{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+#add-club-form .form-group{
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+}
+
+#add-club-form .form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+
+#add-club-form label{
+  font-family:'Cairo',sans-serif;
+  font-size:12.5px;
+  font-weight:800;
+  color:var(--navy-deep);
+}
+
+#add-club-form input{
+  width:100%;
+  height:46px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fafaf8;
+  color:var(--ink);
+  font-family:'Tajawal',sans-serif;
+  font-size:14px;
+  padding:0 13px;
+  outline:none;
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+#add-club-form input::placeholder{
+  color:#a3a5aa;
+}
+
+#add-club-form input:hover{
+  border-color:#d5d2c9;
+}
+
+#add-club-form input:focus{
+  background:var(--white);
+  border-color:var(--gold);
+  box-shadow:0 0 0 3px rgba(199,154,46,.13);
+}
+
+/* Google Maps field */
+
+#add-club-form #club-map-url{
+  direction:ltr;
+  text-align:left;
+}
+
+#location-status{
+  background:#f7f6f1;
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 11px;
+  font-size:11.5px;
+  line-height:1.7;
+  color:var(--muted);
+}
+
+/* information note */
+
+#add-club-form .form-note{
+  background:rgba(18,35,71,.045);
+  border:1px solid rgba(18,35,71,.08);
+  border-radius:11px;
+  padding:10px 12px;
+  font-size:11.5px;
+  line-height:1.7;
+  color:var(--muted);
+  font-weight:600;
+}
+
+/* submit button */
+
+#submit-club-btn{
+  width:100%;
+  min-height:48px;
+  border:none;
+  border-radius:13px;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  color:var(--navy-deep);
+  font-family:'Cairo',sans-serif;
+  font-size:14px;
+  font-weight:800;
+  box-shadow:0 9px 22px rgba(199,154,46,.24);
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    filter .2s ease;
+}
+
+#submit-club-btn:hover{
+  transform:translateY(-1px);
+  box-shadow:0 12px 26px rgba(199,154,46,.32);
+  filter:saturate(1.05);
+}
+
+#submit-club-btn:active{
+  transform:scale(.985);
+}
+
+#submit-club-btn:disabled{
+  opacity:.65;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+
+/* close button */
+
+.add-club-modal-card .modal-close{
+  transition:
+    background .2s ease,
+    color .2s ease,
+    transform .2s ease;
+}
+
+.add-club-modal-card .modal-close:hover{
+  background:#eeeae0;
+  color:var(--navy-deep);
+  transform:rotate(90deg);
+}
+
+/* mobile */
+
+@media (max-width:560px){
+
+  .add-club-modal-card{
+    padding:20px 16px 24px;
+    max-height:92vh;
+  }
+
+  .add-club-modal-card .modal-header{
+    gap:11px;
+    margin-bottom:20px;
+    padding-bottom:15px;
+  }
+
+  .add-club-modal-card .modal-icon{
+    width:46px;
+    height:46px;
+    border-radius:14px;
+    font-size:22px;
+  }
+
+  .add-club-modal-card .modal-header h2{
+    font-size:17px;
+  }
+
+  .add-club-modal-card .modal-header p{
+    font-size:11.5px;
+  }
+
+  #add-club-form{
+    gap:14px;
+  }
+
+  #add-club-form .form-row{
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+
+  #add-club-form input{
+    height:48px;
+    font-size:14px;
+  }
+
+  #submit-club-btn{
+    min-height:50px;
+    font-size:14px;
+  }
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -731,6 +965,7 @@ function showToast(msg){
 
 const addClubModalHTML = `
 <div id="add-club-modal" class="modal-overlay">
+
   <div class="modal-card add-club-modal-card">
 
     <button
@@ -741,112 +976,221 @@ const addClubModalHTML = `
     >×</button>
 
     <div class="modal-header">
+
       <div class="modal-icon">🥋</div>
+
       <div>
         <h2>إضافة نادي أو قاعة</h2>
         <p>أرسل معلومات النادي للمراجعة والاعتماد</p>
       </div>
+
     </div>
 
     <form id="add-club-form">
 
       <div class="form-group">
-        <label for="club-name">اسم النادي *</label>
-        <input id="club-name" name="club_name" type="text"
-          required placeholder="اسم النادي">
+
+        <label for="club-name">
+          اسم النادي *
+        </label>
+
+        <input
+          id="club-name"
+          name="club_name"
+          type="text"
+          required
+          placeholder="اسم النادي"
+        >
+
       </div>
 
       <div class="form-row">
+
         <div class="form-group">
-          <label for="club-wilaya">الولاية *</label>
-          <input id="club-wilaya" name="wilaya" type="text"
-            required placeholder="الولاية">
+
+          <label for="club-wilaya">
+            الولاية *
+          </label>
+
+          <input
+            id="club-wilaya"
+            name="wilaya"
+            type="text"
+            required
+            placeholder="الولاية"
+          >
+
         </div>
 
         <div class="form-group">
-          <label for="club-commune">البلدية *</label>
-          <input id="club-commune" name="commune" type="text"
-            required placeholder="البلدية">
+
+          <label for="club-commune">
+            البلدية *
+          </label>
+
+          <input
+            id="club-commune"
+            name="commune"
+            type="text"
+            required
+            placeholder="البلدية"
+          >
+
         </div>
+
       </div>
 
       <div class="form-group">
-        <label for="club-address">العنوان</label>
-        <input id="club-address" name="address" type="text"
-          placeholder="العنوان">
+
+        <label for="club-address">
+          العنوان
+        </label>
+
+        <input
+          id="club-address"
+          name="address"
+          type="text"
+          placeholder="العنوان"
+        >
+
       </div>
 
       <div class="form-group">
-        <label for="club-coach">اسم المدرب *</label>
-        <input id="club-coach" name="coach_name" type="text"
-          required placeholder="اسم المدرب">
+
+        <label for="club-coach">
+          اسم المدرب *
+        </label>
+
+        <input
+          id="club-coach"
+          name="coach_name"
+          type="text"
+          required
+          placeholder="اسم المدرب"
+        >
+
       </div>
 
       <div class="form-row">
+
         <div class="form-group">
-          <label for="club-phone">الهاتف</label>
-          <input id="club-phone" name="phone" type="tel"
-            placeholder="0550000000">
+
+          <label for="club-phone">
+            الهاتف
+          </label>
+
+          <input
+            id="club-phone"
+            name="phone"
+            type="tel"
+            placeholder="0550000000"
+          >
+
         </div>
 
         <div class="form-group">
-          <label for="club-whatsapp">واتساب</label>
-          <input id="club-whatsapp" name="whatsapp" type="text"
-            placeholder="213550000000">
+
+          <label for="club-whatsapp">
+            واتساب
+          </label>
+
+          <input
+            id="club-whatsapp"
+            name="whatsapp"
+            type="text"
+            placeholder="213550000000"
+          >
+
         </div>
+
       </div>
 
       <div class="form-row">
+
         <div class="form-group">
-          <label for="club-days">أيام التدريب</label>
-          <input id="club-days" name="training_days" type="text"
-            placeholder="السبت، الاثنين، الأربعاء">
+
+          <label for="club-days">
+            أيام التدريب
+          </label>
+
+          <input
+            id="club-days"
+            name="training_days"
+            type="text"
+            placeholder="السبت، الاثنين، الأربعاء"
+          >
+
         </div>
 
         <div class="form-group">
-          <label for="club-hours">أوقات التدريب</label>
-          <input id="club-hours" name="training_hours" type="text"
-            placeholder="18:00 إلى 20:00">
+
+          <label for="club-hours">
+            أوقات التدريب
+          </label>
+
+          <input
+            id="club-hours"
+            name="training_hours"
+            type="text"
+            placeholder="18:00 إلى 20:00"
+          >
+
         </div>
+
       </div>
 
-<div class="form-group">
-  <label for="club-map-url">
-    📍 رابط موقع النادي على Google Maps
-    <span style="opacity:.6;">(اختياري)</span>
-  </label>
+      <div class="form-group">
 
-  <input
-    id="club-map-url"
-    name="map_url"
-    type="url"
-    placeholder="ألصق رابط Google Maps هنا"
-  >
+        <label for="club-map-url">
+          📍 رابط موقع النادي على Google Maps
+          <span style="opacity:.6;">(اختياري)</span>
+        </label>
 
-  <div
-    id="location-status"
-    class="form-note"
-    style="margin-top:10px;"
-  >
-    لا تحتاج إلى تحديد موقعك يدويًا. سيحاول النظام تحديد موقع النادي تلقائيًا من الولاية والبلدية والعنوان.
-  </div>
+        <input
+          id="club-map-url"
+          name="map_url"
+          type="url"
+          placeholder="ألصق رابط Google Maps هنا"
+        >
 
-  <input type="hidden" id="club-lat" name="latitude">
-  <input type="hidden" id="club-lng" name="longitude">
-</div>
+        <div
+          id="location-status"
+          class="form-note"
+          style="margin-top:10px;"
+        >
+          لا تحتاج إلى تحديد موقعك يدويًا. سيحاول النظام تحديد موقع النادي تلقائيًا من الولاية والبلدية والعنوان.
+        </div>
 
- 
+        <input
+          type="hidden"
+          id="club-lat"
+          name="latitude"
+        >
+
+        <input
+          type="hidden"
+          id="club-lng"
+          name="longitude"
+        >
+
+      </div>
 
       <div class="form-note">
         ℹ️ سيتم مراجعة بيانات النادي قبل ظهوره على الخريطة.
       </div>
 
-      <button id="submit-club-btn" type="submit" class="primary-btn">
+      <button
+        id="submit-club-btn"
+        type="submit"
+        class="primary-btn"
+      >
         إرسال النادي للمراجعة
       </button>
 
     </form>
+
   </div>
+
 </div>
 `;
 

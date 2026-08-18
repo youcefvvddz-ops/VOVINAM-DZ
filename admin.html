@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>VOVINAM DZ — لوحة التحكم</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f6f8;
+      color: #1f2937;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    /* LOGIN */
+
+    #login-screen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background:
+        radial-gradient(circle at top right, #7f1d1d, transparent 35%),
+        #111827;
+    }
+
+    .login-box {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      padding: 35px;
+      border-radius: 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    }
+
+    .login-logo {
+      text-align: center;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .login-box h1 {
+      text-align: center;
+      margin: 0 0 8px;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      color: #64748b;
+      margin-bottom: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: bold;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 15px;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: #a92328;
+    }
+
+    .login-btn {
+      width: 100%;
+      border: 0;
+      padding: 14px;
+      border-radius: 10px;
+      background: #a92328;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .login-error {
+      display: none;
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    /* DASHBOARD */
+
+    #dashboard {
+      display: none;
+    }
+
+    .topbar {
+      background: #111827;
+      color: white;
+      padding: 18px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .brand {
+      font-size: 21px;
+      font-weight: bold;
+    }
+
+    .logout-btn {
+      border: 0;
+      background: #374151;
+      color: white;
+      padding: 9px 15px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 30px;
+    }
+
+    .stat {
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 5px 20px rgba(0,0,0,.05);
+    }
+
+    .stat-title {
+      color: #64748b;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .orange {
+      color: #d97706;
+    }
+
+    .green {
+      color: #16a34a;
+    }
+
+    .red {
+      color: #dc2626;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+      gap: 15px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+    }
+
+    .refresh-btn {
+      border: 0;
+      background: #111827;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+
+    .club-card {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      margin-bottom: 16px;
+      box-shadow: 0 5px 20px rgba(0,0,0,.05);
+    }
+
+    .club-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 18px;
+    }
+
+    .club-name {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .pending-badge {
+      background: #fff7ed;
+      color: #c2410c;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+    }
+
+    .club-info {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      color: #475569;
+      line-height: 1.6;
+    }
+
+    .club-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .club-actions button {
+      border: 0;
+      padding: 11px 18px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .approve-btn {
+      background: #16a34a;
+      color: white;
+    }
+
+    .reject-btn {
+      background: #dc2626;
+      color: white;
+    }
+
+    .details-btn {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .empty {
+      background: white;
+      border-radius: 18px;
+      padding: 50px 20px;
+      text-align: center;
+      color: #64748b;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 30px;
+    }
+
+    @media(max-width:700px) {
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .club-info {
+        grid-template-columns: 1fr;
+      }
+
+      .club-top {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar {
+        padding: 15px;
+      }
+
+      .container {
+        padding: 0 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ================= LOGIN ================= -->
+
+<section id="login-screen">
+
+  <div class="login-box">
+
+    <div class="login-logo">🥋</div>
+
+    <h1>VOVINAM DZ</h1>
+
+    <div class="login-subtitle">
+      لوحة تحكم الإدارة
+    </div>
+
+    <div id="login-error" class="login-error"></div>
+
+    <form id="login-form">
+
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+
+        <input
+          id="email"
+          type="email"
+          required
+          autocomplete="email"
+        >
+      </div>
+
+      <div class="form-group">
+        <label>كلمة المرور</label>
+
+        <input
+          id="password"
+          type="password"
+          required
+          autocomplete="current-password"
+        >
+      </div>
+
+      <button
+        id="login-btn"
+        class="login-btn"
+        type="submit"
+      >
+        تسجيل الدخول
+      </button>
+
+    </form>
+
+  </div>
+
+</section>
+
+
+<!-- ================= DASHBOARD ================= -->
+
+<section id="dashboard">
+
+  <header class="topbar">
+
+    <div class="brand">
+      🥋 VOVINAM DZ — لوحة التحكم
+    </div>
+
+    <button
+      id="logout-btn"
+      class="logout-btn"
+    >
+      تسجيل الخروج
+    </button>
+
+  </header>
+
+
+  <main class="container">
+
+    <section class="stats">
+
+      <div class="stat">
+        <div class="stat-title">
+          🟠 قيد المراجعة
+        </div>
+
+        <div
+          id="pending-count"
+          class="stat-number orange"
+        >
+          0
+        </div>
+      </div>
+
+
+      <div class="stat">
+        <div class="stat-title">
+          🟢 الأندية المعتمدة
+        </div>
+
+        <div
+          id="approved-count"
+          class="stat-number green"
+        >
+          0
+        </div>
+      </div>
+
+
+      <div class="stat">
+        <div class="stat-title">
+          🔴 المرفوضة
+        </div>
+
+        <div
+          id="rejected-count"
+          class="stat-number red"
+        >
+          0
+        </div>
+      </div>
+
+    </section>
+
+
+    <section>
+
+      <div class="section-header">
+
+        <h2>
+          طلبات الأندية
+        </h2>
+
+        <button
+          id="refresh-btn"
+          class="refresh-btn"
+        >
+          ↻ تحديث
+        </button>
+
+      </div>
+
+
+      <div id="clubs-container">
+
+        <div class="loading">
+          جارٍ تحميل الطلبات...
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</section>
+
+
+<script>
+
+const SUPABASE_URL =
+  "https://znheglhdvczgcekcuvep.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_Mj_cSgeU0U1gNpYGv7SIwA_HUuJ0KHC";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_ANON_KEY
+  );
+
+
+const loginScreen =
+  document.getElementById("login-screen");
+
+const dashboard =
+  document.getElementById("dashboard");
+
+const loginForm =
+  document.getElementById("login-form");
+
+const loginError =
+  document.getElementById("login-error");
+
+const loginBtn =
+  document.getElementById("login-btn");
+
+const clubsContainer =
+  document.getElementById("clubs-container");
+
+
+/* ================= LOGIN ================= */
+
+loginForm.addEventListener(
+  "submit",
+  async (e) => {
+
+    e.preventDefault();
+
+    loginError.style.display = "none";
+
+    loginBtn.disabled = true;
+    loginBtn.textContent =
+      "⏳ جارٍ تسجيل الدخول...";
+
+
+    const email =
+      document.getElementById("email").value.trim();
+
+    const password =
+      document.getElementById("password").value;
+
+
+    const { error } =
+      await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
+
+
+    if (error) {
+
+      console.error(
+        "Login error:",
+        error
+      );
+
+      loginError.textContent =
+        "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+
+      loginError.style.display = "block";
+
+      loginBtn.disabled = false;
+
+      loginBtn.textContent =
+        "تسجيل الدخول";
+
+      return;
+    }
+
+
+    await showDashboard();
+
+  }
+);
+
+
+/* ================= CHECK SESSION ================= */
+
+async function checkSession() {
+
+  const {
+    data: {
+      session
+    }
+  } = await supabaseClient.auth.getSession();
+
+
+  if (session) {
+
+    await showDashboard();
+
+  } else {
+
+    showLogin();
+
+  }
+
+}
+
+
+/* ================= SHOW LOGIN ================= */
+
+function showLogin() {
+
+  loginScreen.style.display =
+    "flex";
+
+  dashboard.style.display =
+    "none";
+
+}
+
+
+/* ================= SHOW DASHBOARD ================= */
+
+async function showDashboard() {
+
+  loginScreen.style.display =
+    "none";
+
+  dashboard.style.display =
+    "block";
+
+  await loadDashboard();
+
+}
+
+
+/* ================= LOAD DASHBOARD ================= */
+
+async function loadDashboard() {
+
+  clubsContainer.innerHTML = `
+    <div class="loading">
+      ⏳ جارٍ تحميل طلبات الأندية...
+    </div>
+  `;
+
+
+  const { data, error } =
+    await supabaseClient
+      .from("clubs")
+      .select("*")
+      .order("created_at", {
+        ascending: false
+      });
+
+
+  if (error) {
+
+    console.error(
+      "Dashboard load error:",
+      error
+    );
+
+    clubsContainer.innerHTML = `
+      <div class="empty">
+        ❌ تعذر تحميل بيانات الأندية.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  const clubs =
+    data || [];
+
+
+  const pending =
+    clubs.filter(
+      club => club.status === "pending"
+    );
+
+  const approved =
+    clubs.filter(
+      club => club.status === "approved"
+    );
+
+  const rejected =
+    clubs.filter(
+      club => club.status === "rejected"
+    );
+
+
+  document.getElementById(
+    "pending-count"
+  ).textContent =
+    pending.length;
+
+
+  document.getElementById(
+    "approved-count"
+  ).textContent =
+    approved.length;
+
+
+  document.getElementById(
+    "rejected-count"
+  ).textContent =
+    rejected.length;
+
+
+  
+
+ /* ================= DISPLAY CLUBS ================= */
+
+let html = "";
+
+
+/* ================= PENDING CLUBS ================= */
+
+html += `
+  <div class="section-title">
+    <h2>📋 طلبات الأندية قيد المراجعة</h2>
+    <span>${pending.length}</span>
+  </div>
+`;
+
+if (!pending.length) {
+
+  html += `
+    <div class="empty">
+      🎉 لا توجد طلبات أندية قيد المراجعة.
+    </div>
+  `;
+
+} else {
+
+  html += pending.map(club => `
+
+    <article class="club-card">
+
+      <div class="club-top">
+
+        <div class="club-name">
+          🥋 ${escapeHtml(
+            club.club_name || "بدون اسم"
+          )}
+        </div>
+
+        <div class="pending-badge">
+          قيد المراجعة
+        </div>
+
+      </div>
+
+
+      <div class="club-info">
+
+        <div>
+          📍
+          ${escapeHtml(club.wilaya || "-")}
+          —
+          ${escapeHtml(club.commune || "-")}
+        </div>
+
+        <div>
+          👤 المدرب:
+          ${escapeHtml(club.coach_name || "-")}
+        </div>
+
+        <div>
+          📞
+          ${escapeHtml(club.phone || "-")}
+        </div>
+
+        <div>
+          💬 واتساب:
+          ${escapeHtml(club.whatsapp || "-")}
+        </div>
+
+        <div>
+          🗓️ أيام التدريب:
+          ${escapeHtml(club.training_days || "-")}
+        </div>
+
+        <div>
+          🕐 أوقات التدريب:
+          ${escapeHtml(club.training_hours || "-")}
+        </div>
+
+        <div>
+          🏠 العنوان:
+          ${escapeHtml(club.address || "-")}
+        </div>
+
+        <div>
+          📍 الموقع:
+          ${
+            club.latitude != null &&
+            club.longitude != null
+              ? "تم تحديد الموقع ✓"
+              : "لم يتم تحديد الموقع"
+          }
+        </div>
+
+      </div>
+
+
+      <div class="club-actions">
+
+        <button
+          class="details-btn"
+          onclick="showDetails('${club.id}')"
+        >
+          👁️ التفاصيل
+        </button>
+
+        <button
+          class="approve-btn"
+          onclick="approveClub('${club.id}')"
+        >
+          ✓ اعتماد النادي
+        </button>
+
+        <button
+          class="reject-btn"
+          onclick="rejectClub('${club.id}')"
+        >
+          ✕ رفض
+        </button>
+
+      </div>
+
+    </article>
+
+  `).join("");
+
+}
+
+
+/* ================= APPROVED CLUBS ================= */
+
+html += `
+  <div class="section-title approved-section-title">
+    <h2>🥋 الأندية المعتمدة</h2>
+    <span>${approved.length}</span>
+  </div>
+`;
+
+if (!approved.length) {
+
+  html += `
+    <div class="empty">
+      لا توجد أندية معتمدة حاليًا.
+    </div>
+  `;
+
+} else {
+
+  html += approved.map(club => `
+
+    <article class="club-card">
+
+      <div class="club-top">
+
+        <div class="club-name">
+          🥋 ${escapeHtml(
+            club.club_name || "بدون اسم"
+          )}
+        </div>
+
+        <div class="approved-badge">
+          ✓ معتمد
+        </div>
+
+      </div>
+
+
+      <div class="club-info">
+
+        <div>
+          📍
+          ${escapeHtml(club.wilaya || "-")}
+          —
+          ${escapeHtml(club.commune || "-")}
+        </div>
+
+        <div>
+          👤 المدرب:
+          ${escapeHtml(club.coach_name || "-")}
+        </div>
+
+        <div>
+          📞
+          ${escapeHtml(club.phone || "-")}
+        </div>
+
+        <div>
+          💬 واتساب:
+          ${escapeHtml(club.whatsapp || "-")}
+        </div>
+
+        <div>
+          🗓️ أيام التدريب:
+          ${escapeHtml(club.training_days || "-")}
+        </div>
+
+        <div>
+          🕐 أوقات التدريب:
+          ${escapeHtml(club.training_hours || "-")}
+        </div>
+
+        <div>
+          🏠 العنوان:
+          ${escapeHtml(club.address || "-")}
+        </div>
+
+        <div>
+          📍 الموقع:
+          ${
+            club.latitude != null &&
+            club.longitude != null
+              ? "تم تحديد الموقع ✓"
+              : "لم يتم تحديد الموقع"
+          }
+        </div>
+
+      </div>
+
+
+      <div class="club-actions">
+
+        <button
+          class="details-btn"
+          onclick="showDetails('${club.id}')"
+        >
+          👁️ التفاصيل
+        </button>
+
+        <button
+          class="edit-btn"
+          onclick="editClub('${club.id}')"
+        >
+          ✏️ تعديل
+        </button>
+
+        <button
+          class="delete-btn"
+          onclick="deleteClub('${club.id}')"
+        >
+          🗑️ حذف
+        </button>
+
+      </div>
+
+    </article>
+
+  `).join("");
+
+}
+
+
+/* ================= INSERT INTO PAGE ================= */
+
+clubsContainer.innerHTML = html;
+
+} // نهاية loadDashboard
+
+/* ================= DELETE CLUB ================= */
+
+async function deleteClub(id) {
+
+  const confirmed = confirm(
+    "⚠️ هل أنت متأكد من حذف هذا النادي نهائيًا؟\n\nلا يمكن التراجع عن هذه العملية."
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+
+    const { error } = await supabaseClient
+      .from("clubs")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Delete club error:", error);
+      throw error;
+    }
+
+    alert("✓ تم حذف النادي بنجاح");
+
+await loadDashboard();
+
+  } catch (error) {
+
+    console.error("DELETE CLUB ERROR:", error);
+
+    showToast(
+      "تعذر حذف النادي: " +
+      (error?.message || "خطأ غير معروف")
+    );
+  }
+}
+
+/* ================= DETAILS ================= */
+
+window.showDetails =
+  function(id) {
+
+    const card =
+      document.querySelector(
+        `[onclick="showDetails('${id}')"]`
+      );
+
+    if (!card) return;
+
+    const text =
+      card.closest(".club-card")
+        .innerText;
+
+    alert(text);
+
+  };
+
+
+/* ================= APPROVE ================= */
+
+window.approveClub =
+  async function(id) {
+
+    const confirmed =
+      confirm(
+        "هل أنت متأكد من اعتماد هذا النادي؟\n\nبعد الاعتماد سيظهر على خريطة VOVINAM DZ."
+      );
+
+    if (!confirmed) return;
+
+
+    const { error } =
+      await supabaseClient
+        .from("clubs")
+        .update({
+          status: "approved"
+        })
+        .eq("id", id);
+
+
+    if (error) {
+
+      console.error(
+        "Approve error:",
+        error
+      );
+
+      alert(
+        "تعذر اعتماد النادي."
+      );
+
+      return;
+    }
+
+
+    alert(
+      "✓ تم اعتماد النادي بنجاح."
+    );
+
+
+    await loadDashboard();
+
+  };
+
+
+/* ================= REJECT ================= */
+
+window.rejectClub =
+  async function(id) {
+
+    const confirmed =
+      confirm(
+        "هل أنت متأكد من رفض هذا النادي؟"
+      );
+
+    if (!confirmed) return;
+
+
+    const { error } =
+      await supabaseClient
+        .from("clubs")
+        .update({
+          status: "rejected"
+        })
+        .eq("id", id);
+
+
+    if (error) {
+
+      console.error(
+        "Reject error:",
+        error
+      );
+
+      alert(
+        "تعذر رفض النادي."
+      );
+
+      return;
+    }
+
+
+    alert(
+      "تم رفض النادي."
+    );
+
+
+    await loadDashboard();
+
+  };
+
+
+/* ================= LOGOUT ================= */
+
+document
+  .getElementById("logout-btn")
+  .addEventListener(
+    "click",
+    async () => {
+
+      await supabaseClient.auth.signOut();
+
+      showLogin();
+
+    }
+  );
+
+
+/* ================= REFRESH ================= */
+
+document
+  .getElementById("refresh-btn")
+  .addEventListener(
+    "click",
+    loadDashboard
+  );
+
+
+/* ================= SECURITY ================= */
+
+function escapeHtml(value) {
+
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+
+}
+
+
+/* ================= START ================= */
+
+checkSession();
+
+</script>
+
+</body>
+</html>

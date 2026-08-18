@@ -1012,13 +1012,13 @@ const addClubModalHTML = `
             الولاية *
           </label>
 
-          <input
-            id="club-wilaya"
-            name="wilaya"
-            type="text"
-            required
-            placeholder="الولاية"
-          >
+         <select
+  id="club-wilaya"
+  name="wilaya"
+  required
+>
+  <option value="">اختر الولاية</option>
+</select>
 
         </div>
 
@@ -1028,13 +1028,14 @@ const addClubModalHTML = `
             البلدية *
           </label>
 
-          <input
-            id="club-commune"
-            name="commune"
-            type="text"
-            required
-            placeholder="البلدية"
-          >
+         <select
+  id="club-commune"
+  name="commune"
+  required
+  disabled
+>
+  <option value="">اختر الولاية أولاً</option>
+</select>
 
         </div>
 
@@ -1193,9 +1194,77 @@ const addClubModalHTML = `
 
 </div>
 `;
+async function loadAlgeriaWilayas() {
+  const wilayaSelect = document.getElementById("club-wilaya");
+  const communeSelect = document.getElementById("club-commune");
 
+  if (!wilayaSelect || !communeSelect) return;
+
+  try {
+    const response = await fetch("./data/algeria.json");
+
+    if (!response.ok) {
+      throw new Error("تعذر تحميل ملف الولايات");
+    }
+
+    const data = await response.json();
+
+    wilayaSelect.innerHTML = `
+      <option value="">اختر الولاية</option>
+    `;
+
+    data.forEach(wilaya => {
+      const option = document.createElement("option");
+
+      option.value = wilaya.code;
+      option.textContent =
+        `${String(wilaya.code).padStart(2, "0")} - ${wilaya.name}`;
+
+      wilayaSelect.appendChild(option);
+    });
+
+    wilayaSelect.addEventListener("change", function () {
+      const selectedWilaya = data.find(
+        wilaya => Number(wilaya.code) === Number(this.value)
+      );
+
+      communeSelect.innerHTML = `
+        <option value="">اختر البلدية</option>
+      `;
+
+      if (!selectedWilaya) {
+        communeSelect.disabled = true;
+        return;
+      }
+
+      selectedWilaya.communes.forEach(commune => {
+        const option = document.createElement("option");
+
+        option.value = commune.name;
+        option.textContent = commune.name;
+
+        communeSelect.appendChild(option);
+      });
+
+      communeSelect.disabled = false;
+    });
+
+  } catch (error) {
+    console.error("Algeria data error:", error);
+
+    wilayaSelect.innerHTML = `
+      <option value="">تعذر تحميل الولايات</option>
+    `;
+
+    communeSelect.innerHTML = `
+      <option value="">تعذر تحميل البلديات</option>
+    `;
+
+    communeSelect.disabled = true;
+  }
+}
 document.body.insertAdjacentHTML('beforeend', addClubModalHTML);
-
+loadAlgeriaWilayas();
 
 /* ================= ADD CLUB EVENTS ================= */
 
@@ -1208,161 +1277,251 @@ addClubForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
   const submitBtn = document.getElementById('submit-club-btn');
+  const locationStatus = document.getElementById('location-status');
 
   submitBtn.disabled = true;
   submitBtn.textContent = '⏳ جارٍ إرسال الطلب...';
 
   const formData = new FormData(addClubForm);
 
-/* ================= AUTO GEOCODING ================= */
+  /* ================= FORM DATA ================= */
 
-let latitude = formData.get('latitude')
-  ? Number(formData.get('latitude'))
-  : null;
+  const clubName = formData.get('club_name')?.trim() || null;
+  const address = formData.get('address')?.trim() || null;
+  const coachName = formData.get('coach_name')?.trim() || null;
+  const phone = formData.get('phone')?.trim() || null;
+  const whatsapp = formData.get('whatsapp')?.trim() || null;
+  const trainingDays = formData.get('training_days')?.trim() || null;
+  const trainingHours = formData.get('training_hours')?.trim() || null;
+  const mapUrl = formData.get('map_url')?.trim() || null;
 
-let longitude = formData.get('longitude')
-  ? Number(formData.get('longitude'))
-  : null;
+  /* ================= WILAYA ================= */
 
-const wilaya = formData.get('wilaya')?.trim() || '';
-const commune = formData.get('commune')?.trim() || '';
-const address = formData.get('address')?.trim() || '';
+  const wilayaSelect = document.getElementById('club-wilaya');
+  const selectedWilayaOption =
+    wilayaSelect?.options[wilayaSelect.selectedIndex];
 
-/*
-  إذا لم تكن هناك إحداثيات يدوية،
-  نحاول تحديد الموقع تلقائيًا من:
-  العنوان + البلدية + الولاية
-*/
+  const wilayaCode = wilayaSelect?.value || null;
 
-if (!latitude || !longitude) {
+  let wilayaName = null;
 
-  try {
+  if (selectedWilayaOption && selectedWilayaOption.value) {
+    wilayaName = selectedWilayaOption.textContent
+      .replace(/^\d+\s*-\s*/, '')
+      .trim();
+  }
 
-    submitBtn.textContent = '📍 جارٍ تحديد موقع النادي...';
+  /* ================= COMMUNE ================= */
 
- const { data: geoData, error: geoError } =
-  await supabaseClient.functions.invoke(
-    'bright-responder',
-    {
-      body: {
-        wilaya,
-        commune,
-        address
+  const commune = formData.get('commune')?.trim() || null;
+
+  console.log('Selected location:', {
+    wilayaCode,
+    wilayaName,
+    commune,
+    address
+  });
+
+  /* ================= EXISTING COORDINATES ================= */
+
+  let latitude = formData.get('latitude')
+    ? Number(formData.get('latitude'))
+    : null;
+
+  let longitude = formData.get('longitude')
+    ? Number(formData.get('longitude'))
+    : null;
+
+  /* ================= AUTO GEOCODING ================= */
+
+  if (!latitude || !longitude) {
+
+    try {
+
+      submitBtn.textContent = '📍 جارٍ تحديد موقع النادي...';
+
+      if (locationStatus) {
+        locationStatus.textContent =
+          '📍 جارٍ تحديد موقع النادي تلقائيًا...';
       }
-    }
-  );
 
-if (geoError) {
-  throw geoError;
-}
+      const { data: geoData, error: geoError } =
+        await supabaseClient.functions.invoke(
+          'bright-responder',
+          {
+            body: {
+              wilaya: wilayaName,
+              wilaya_code: wilayaCode,
+              commune: commune,
+              address: address,
+              map_url: mapUrl
+            }
+          }
+        );
 
-console.log(
-  'Automatic geocoding result:',
-  geoData
-);
-
-if (geoData?.success) {
-
-  latitude = Number(geoData.latitude);
-  longitude = Number(geoData.longitude);
-
-  console.log(
-    'Club location detected:',
-    latitude,
-    longitude
-  );
-
-} else {
-
-  console.warn(
-    'Could not determine club location:',
-    geoData
-  );
-}
-
-    console.log(
-      'Automatic geocoding result:',
-      geoData
-    );
-
-    if (geoData.success) {
-
-      latitude = geoData.latitude;
-      longitude = geoData.longitude;
+      if (geoError) {
+        throw geoError;
+      }
 
       console.log(
-        'Club location detected:',
-        latitude,
-        longitude
-      );
-
-    } else {
-
-      console.warn(
-        'Could not determine club location:',
+        'Automatic geocoding result:',
         geoData
       );
 
+      if (
+        geoData?.success &&
+        geoData.latitude != null &&
+        geoData.longitude != null
+      ) {
+
+        latitude = Number(geoData.latitude);
+        longitude = Number(geoData.longitude);
+
+        console.log(
+          'Club location detected:',
+          latitude,
+          longitude
+        );
+
+        if (locationStatus) {
+          locationStatus.textContent =
+            '📍 تم تحديد موقع النادي تلقائيًا بنجاح.';
+        }
+
+      } else {
+
+        console.warn(
+          'Could not determine club location:',
+          geoData
+        );
+
+        if (locationStatus) {
+          locationStatus.textContent =
+            '⚠️ تعذر تحديد الموقع تلقائيًا. سيتم إرسال النادي بدون إحداثيات.';
+        }
+
+      }
+
+    } catch (geoError) {
+
+      console.error(
+        'Geocoding request failed:',
+        geoError
+      );
+
+      if (locationStatus) {
+        locationStatus.textContent =
+          '⚠️ تعذر تحديد الموقع تلقائيًا. سيتم إرسال النادي بدون إحداثيات.';
+      }
+
     }
-
-  } catch (geoError) {
-
-    console.error(
-      'Geocoding request failed:',
-      geoError
-    );
-
   }
-}
 
-/* ================= CLUB DATA ================= */
+  /* ================= CLUB DATA ================= */
 
-/* ================= CLUB DATA ================= */
+  const clubData = {
 
-const clubData = {
-  club_name: formData.get('club_name')?.trim() || null,
-  wilaya: formData.get('wilaya')?.trim() || null,
-  commune: formData.get('commune')?.trim() || null,
-  address: formData.get('address')?.trim() || null,
-  map_url: formData.get('map_url')?.trim() || null,
-  coach_name: formData.get('coach_name')?.trim() || null,
-  phone: formData.get('phone')?.trim() || null,
-  whatsapp: formData.get('whatsapp')?.trim() || null,
-  training_days: formData.get('training_days')?.trim() || null,
-  training_hours: formData.get('training_hours')?.trim() || null,
+    club_name: clubName,
 
-  latitude: latitude,
-  longitude: longitude,
-
-  status: 'pending'
-};
-
-   try {
-
-   const { error } = await supabaseClient
-  .from('clubs')
-  .insert([clubData]);
-
-    if (error) {
-      console.error('Club submission error:', error);
-      throw error;
-    }
+    // نحفظ اسم الولاية وليس رقمها
+    wilaya: wilayaName,
 
     
 
-    showToast('✓ تم إرسال النادي بنجاح للمراجعة');
+    commune: commune,
+
+    address: address,
+
+    map_url: mapUrl,
+
+    coach_name: coachName,
+
+    phone: phone,
+
+    whatsapp: whatsapp,
+
+    training_days: trainingDays,
+
+    training_hours: trainingHours,
+
+    latitude: latitude,
+
+    longitude: longitude,
+
+    status: 'pending'
+  };
+
+  console.log(
+    'Club data to insert:',
+    clubData
+  );
+
+  /* ================= SUPABASE INSERT ================= */
+
+  try {
+
+    const { error } = await supabaseClient
+      .from('clubs')
+      .insert([clubData]);
+
+    if (error) {
+      console.error(
+        'Club submission error:',
+        error
+      );
+
+      throw error;
+    }
+
+    showToast(
+      '✓ تم إرسال النادي بنجاح للمراجعة'
+    );
 
     addClubForm.reset();
 
-    document.getElementById('location-status').textContent =
-      'يمكنك إرسال النادي بدون تحديد الموقع، وإضافته لاحقًا.';
+    /* إعادة تعطيل البلدية بعد إعادة ضبط النموذج */
+
+    const communeSelect =
+      document.getElementById('club-commune');
+
+    if (communeSelect) {
+      communeSelect.innerHTML = `
+        <option value="">اختر الولاية أولاً</option>
+      `;
+
+      communeSelect.disabled = true;
+    }
+
+    /* مسح الإحداثيات المخفية */
+
+    const latInput =
+      document.getElementById('club-lat');
+
+    const lngInput =
+      document.getElementById('club-lng');
+
+    if (latInput) {
+      latInput.value = '';
+    }
+
+    if (lngInput) {
+      lngInput.value = '';
+    }
+
+    if (locationStatus) {
+      locationStatus.textContent =
+        'لا تحتاج إلى تحديد موقعك يدويًا. سيحاول النظام تحديد موقع النادي تلقائيًا من الولاية والبلدية والعنوان.';
+    }
 
     addClubModal.classList.remove('show');
     document.body.style.overflow = '';
 
   } catch (error) {
 
-    console.error('CLUB INSERT ERROR:', error);
+    console.error(
+      'CLUB INSERT ERROR:',
+      error
+    );
 
     const message =
       error?.message ||
@@ -1370,7 +1529,9 @@ const clubData = {
       error?.hint ||
       'خطأ غير معروف';
 
-    showToast('خطأ: ' + message);
+    showToast(
+      'خطأ: ' + message
+    );
 
     alert(
       'خطأ Supabase:\n\n' +
@@ -1382,12 +1543,12 @@ const clubData = {
   } finally {
 
     submitBtn.disabled = false;
-    submitBtn.textContent = 'إرسال النادي للمراجعة';
+    submitBtn.textContent =
+      'إرسال النادي للمراجعة';
 
   }
 
 });
-
 
 document.getElementById('add-club-btn').addEventListener('click', () => {
   addClubModal.classList.add('show');

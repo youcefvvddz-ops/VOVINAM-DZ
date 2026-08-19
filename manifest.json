@@ -4,7 +4,7 @@
   "description": "دليل الفوفينام في الجزائر لمعرفة الأندية والقاعات والمدربين ومواقع التدريب.",
   "lang": "ar",
   "dir": "rtl",
-  "start_url": "./vovinam-dz.html",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#ffffff",

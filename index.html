@@ -1608,7 +1608,7 @@ function popupHTML(c){
       <div class="p-row">🕐 ${c.hours}</div>
       <div class="popup-actions">
         <a href="tel:${c.phone}">📞 اتصال</a>
-<a class="wa" href="https://wa.me/${normalizeWhatsAppNumber(c.whatsapp)}" target="_blank" rel="noopener">💬 واتساب: ${c.wa || "غير متوفر"}</a>      </div>
+<a class="wa" href="https://wa.me/${normalizeWhatsAppNumber(c.wa)}" target="_blank" rel="noopener">💬 واتساب: ${c.wa || "غير متوفر"}</a>      </div>
     </div>`;
 }
 
@@ -1624,7 +1624,7 @@ function openDetails(id){
   document.getElementById('modal-hours').textContent = c.hours;
   document.getElementById('modal-phone').textContent = c.phone;
   document.getElementById('modal-call').href = `tel:${c.phone}`;
-  document.getElementById('modal-wa').href = `https://wa.me/${normalizeWhatsAppNumber(c.whatsapp)}`;
+document.getElementById('modal-wa').href = `https://wa.me/${normalizeWhatsAppNumber(c.wa)}`;
   const mapBtn = document.getElementById('modal-map');
   mapBtn.onclick = (e) => {
     e.preventDefault();

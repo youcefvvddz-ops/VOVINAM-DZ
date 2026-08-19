@@ -1598,17 +1598,9 @@ function normalizeWhatsAppNumber(phone) {
 function popupHTML(c){
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`;
   return `
-  function normalizeWhatsAppNumber(phone) {
-  let number = String(phone || "").replace(/\D/g, "");
+ 
 
-  if (number.startsWith("0")) {
-    number = "213" + number.substring(1);
-  } else if (!number.startsWith("213")) {
-    number = "213" + number;
-  }
-
-  return number;
-}
+  
     <div class="popup-card">
       <div class="p-title">🥋 ${c.name}</div>
       <div class="p-row">📍 ${c.wilaya} — ${c.commune}</div>
@@ -1616,8 +1608,7 @@ function popupHTML(c){
       <div class="p-row">🕐 ${c.hours}</div>
       <div class="popup-actions">
         <a href="tel:${c.phone}">📞 اتصال</a>
-<a class="wa" href="https://wa.me/${normalizeWhatsAppNumber(c.wa)}" target="_blank" rel="noopener">💬 واتساب</a>        <a class="full" href="${mapsUrl}" target="_blank" rel="noopener">🧭 الاتجاهات</a>
-      </div>
+<a class="wa" href="https://wa.me/${normalizeWhatsAppNumber(c.whatsapp)}" target="_blank" rel="noopener">💬 واتساب: ${c.wa || "غير متوفر"}</a>      </div>
     </div>`;
 }
 
@@ -1633,7 +1624,7 @@ function openDetails(id){
   document.getElementById('modal-hours').textContent = c.hours;
   document.getElementById('modal-phone').textContent = c.phone;
   document.getElementById('modal-call').href = `tel:${c.phone}`;
-  document.getElementById('modal-wa').href = `https://wa.me/${c.wa}`;
+  document.getElementById('modal-wa').href = `https://wa.me/${normalizeWhatsAppNumber(c.whatsapp)}`;
   const mapBtn = document.getElementById('modal-map');
   mapBtn.onclick = (e) => {
     e.preventDefault();

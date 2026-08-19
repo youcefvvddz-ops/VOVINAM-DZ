@@ -2,7 +2,7 @@ const CACHE_NAME = "vovinam-dz-v1";
 
 const FILES_TO_CACHE = [
   "./",
-  "./vovinam-dz.html",
+  "./index.html",
   "./manifest.json"
 ];
 

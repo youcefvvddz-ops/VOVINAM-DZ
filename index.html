@@ -701,7 +701,7 @@
     <div class="wrap">
       <div class="section-head">
         <div class="eyebrow"><span class="dot"></span> خريطة الجزائر</div>
-        <h2>🥋 القاعات القريبة</h2>
+        <h2><span id="finder-icon"></span> القاعات القريبة</h2>
         <p>بيانات تجريبية (Demo Data) حاليًا لعدد قليل من القاعات — الجزائر، عنابة، قسنطينة، وهران وسطيف — كأمثلة أولية فقط، وليست قائمة رسمية شاملة.</p>
       </div>
 
@@ -786,7 +786,7 @@
     </div>
     <div class="footer-bottom">
       <span>© 2026 VOVINAM DZ. جميع الحقوق محفوظة.</span>
-      <span>صُنع بشغف لعائلة الفوفينام في الجزائر 🥋</span>
+     <span>صُنع بشغف لعائلة الفوفينام في الجزائر <span id="footer-icon"></span></span>
     </div>
   </div>
 </footer>
@@ -797,7 +797,7 @@
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal-card" id="modal-card" role="dialog" aria-modal="true">
     <button class="modal-close" id="modal-close" aria-label="إغلاق">✕</button>
-    <div class="modal-image"><span id="modal-emoji">🥋</span></div>
+   <div class="modal-image"><span id="modal-emoji"></span></div>
     <h3 class="modal-title" id="modal-name"></h3>
     <div class="modal-sub" id="modal-loc"></div>
     <div class="modal-rows">
@@ -978,7 +978,7 @@ const addClubModalHTML = `
 
     <div class="modal-header">
 
-      <div class="modal-icon">🥋</div>
+     <div class="modal-icon" id="addclub-modal-icon"></div>
 
       <div>
         <h2>إضافة نادي أو قاعة</h2>
@@ -1585,6 +1585,37 @@ function makeIcon(){
     popupAnchor: [0,-15]
   });
 }
+function VovinamIcon(size = 20) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align:-4px;flex-shrink:0" aria-hidden="true">
+    <circle cx="24" cy="8" r="4.5" fill="#0f2547"/>
+    <path d="M20 13.5 L24 17 L28 13.5" stroke="#0f2547" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M15 16.5 L24 20.5 L33 16.5 L36.5 22 L33.5 24.5 L33.5 38 L14.5 38 L14.5 24.5 L11.5 22 Z" fill="#1a4fd6"/>
+    <path d="M24 20.5 L15 16.5 L14.5 24.5 L14.5 38 L22.5 38 L22.5 24 Z" fill="#1442b8"/>
+    <path d="M11.5 22 L8 27 L11 30 L15 25.5 Z" fill="#1a4fd6"/>
+    <path d="M36.5 22 L40 27 L37 30 L33 25.5 Z" fill="#1a4fd6"/>
+    <rect x="14.5" y="30.5" width="19" height="4.2" fill="#f5c518"/>
+    <path d="M22 32.6 L26 32.6 L27.5 38 L24 36.8 L20.5 38 Z" fill="#f5c518"/>
+  </svg>`;
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const finderIcon = document.getElementById('finder-icon');
+  if (finderIcon) finderIcon.innerHTML = VovinamIcon(28);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const footerIcon = document.getElementById('footer-icon');
+  if (footerIcon) footerIcon.innerHTML = VovinamIcon(18);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const modalIcon = document.getElementById('modal-emoji');
+  if (modalIcon) modalIcon.innerHTML = VovinamIcon(64);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const addClubIcon = document.getElementById('addclub-modal-icon');
+  if (addClubIcon) addClubIcon.innerHTML = VovinamIcon(32);
+});
 function normalizeWhatsAppNumber(phone) {
   let number = String(phone || "").replace(/\D/g, "");
 
@@ -1603,7 +1634,7 @@ function popupHTML(c){
 
   
     <div class="popup-card">
-      <div class="p-title">🥋 ${c.name}</div>
+     <div class="p-title">${VovinamIcon(20)} ${c.name}</div>
       <div class="p-row">📍 ${c.wilaya} — ${c.commune}</div>
       <div class="p-row">👤 ${c.coach}</div>
       <div class="p-row">🕐 ${c.hours}</div>
@@ -1730,7 +1761,7 @@ function renderList(clubs){
     card.className = 'club-card';
     card.dataset.id = c.id;
     card.innerHTML = `
-      <div class="avatar">🥋</div>
+      <div class="avatar">${VovinamIcon(36)}</div>
       <div class="info">
         <b>${c.name}</b>
         <div class="loc">📍 ${c.wilaya} — ${c.commune}</div>

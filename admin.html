@@ -379,7 +379,13 @@
     >
       تسجيل الخروج
     </button>
-
+<button
+  id="backfill-btn"
+  class="logout-btn"
+  style="background:#1a4fd6"
+>
+  📍 تحديد المواقع الناقصة
+</button>
   </header>
 
 
@@ -931,6 +937,98 @@ if (!approved.length) {
 
 }
 
+/* ================= BACKFILL MISSING COORDINATES ================= */
+
+async function backfillCoordinates() {
+
+  const backfillBtn = document.getElementById("backfill-btn");
+
+  const { data, error } = await supabaseClient
+    .from("clubs")
+    .select("id, wilaya, commune, address")
+    .or("latitude.is.null,longitude.is.null");
+
+  if (error) {
+    console.error("Backfill fetch error:", error);
+    alert("تعذر جلب النوادي الناقصة إحداثيات.");
+    return;
+  }
+
+  const missing = data || [];
+
+  if (!missing.length) {
+    alert("✓ كل النوادي عندها إحداثيات محددة بالفعل.");
+    return;
+  }
+
+  const confirmed = confirm(
+    `يوجد ${missing.length} نادي بلا إحداثيات.\nهل تريد محاولة تحديد مواقعهم تلقائيًا الآن؟`
+  );
+
+  if (!confirmed) return;
+
+  backfillBtn.disabled = true;
+
+  let successCount = 0;
+  let failCount = 0;
+
+  for (let i = 0; i < missing.length; i++) {
+
+    const club = missing[i];
+
+    backfillBtn.textContent = `📍 جارٍ المعالجة... (${i + 1}/${missing.length})`;
+
+    try {
+
+      const { data: geoData, error: geoError } =
+        await supabaseClient.functions.invoke("bright-responder", {
+          body: {
+            wilaya: club.wilaya,
+            commune: club.commune,
+            address: club.address,
+          },
+        });
+
+      if (geoError) throw geoError;
+
+      if (geoData?.success && geoData.latitude != null && geoData.longitude != null) {
+
+        const { error: updateError } = await supabaseClient
+          .from("clubs")
+          .update({
+            latitude: Number(geoData.latitude),
+            longitude: Number(geoData.longitude),
+          })
+          .eq("id", club.id);
+
+        if (updateError) throw updateError;
+
+        successCount++;
+
+      } else {
+        failCount++;
+      }
+
+    } catch (err) {
+      console.error("Backfill error for club", club.id, err);
+      failCount++;
+    }
+
+    // تأخير بسيط بين الطلبات باش نحترمو حدود Nominatim (1 طلب/ثانية)
+    await new Promise(resolve => setTimeout(resolve, 1100));
+  }
+
+  backfillBtn.disabled = false;
+  backfillBtn.textContent = "📍 تحديد المواقع الناقصة";
+
+  alert(`✓ تمت المعالجة.\nنجح: ${successCount}\nفشل: ${failCount}`);
+
+  await loadDashboard();
+}
+
+document
+  .getElementById("backfill-btn")
+  .addEventListener("click", backfillCoordinates);
 
 /* ================= INSERT INTO PAGE ================= */
 
